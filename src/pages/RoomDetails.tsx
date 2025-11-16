@@ -146,7 +146,7 @@ const RoomDetails = () => {
                   </Badge>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-primary">${room.price}</div>
+                  <div className="text-3xl font-bold text-primary">₹{room.price}</div>
                   <div className="text-sm text-muted-foreground">per night</div>
                 </div>
               </div>
@@ -222,7 +222,7 @@ const RoomDetails = () => {
                     </div>
                     <div className="flex justify-between text-lg font-bold">
                       <span>Total:</span>
-                      <span className="text-primary">${calculateTotal().toFixed(2)}</span>
+                      <span className="text-primary">₹{calculateTotal().toFixed(2)}</span>
                     </div>
                   </div>
                 )}

@@ -355,7 +355,7 @@ const AdminDashboard = () => {
                       <TableRow key={room.id}>
                         <TableCell className="font-medium">{room.room_number}</TableCell>
                         <TableCell className="capitalize">{room.type}</TableCell>
-                        <TableCell>${room.price}</TableCell>
+                        <TableCell>₹{room.price}</TableCell>
                         <TableCell>
                           <Badge variant={room.is_available ? 'default' : 'secondary'}>
                             {room.is_available ? 'Available' : 'Unavailable'}
@@ -427,7 +427,7 @@ const AdminDashboard = () => {
                             {format(new Date(booking.end_date), 'MMM dd, yyyy')}
                           </div>
                         </TableCell>
-                        <TableCell>${parseFloat(booking.total_price).toFixed(2)}</TableCell>
+                        <TableCell>₹{parseFloat(booking.total_price).toFixed(2)}</TableCell>
                         <TableCell>
                           <Select
                             value={booking.status}
