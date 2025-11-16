@@ -54,7 +54,7 @@ export const RoomCard = ({
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-primary">${price}</div>
+            <div className="text-2xl font-bold text-primary">₹{price}</div>
             <div className="text-xs text-muted-foreground">per night</div>
           </div>
         </div>

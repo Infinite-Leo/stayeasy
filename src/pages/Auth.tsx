@@ -68,7 +68,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Hotel className="h-10 w-10 text-primary" />
-            <h1 className="text-3xl font-bold text-primary">LuxStay</h1>
+            <h1 className="text-3xl font-bold text-primary">Easy Stay</h1>
           </div>
           <p className="text-muted-foreground">Book your perfect stay</p>
         </div>
@@ -152,7 +152,7 @@ const Auth = () => {
                     <Input
                       id="signup-phone"
                       type="tel"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+91 98765 43210"
                       value={signupPhone}
                       onChange={(e) => setSignupPhone(e.target.value)}
                     />
