@@ -13,7 +13,7 @@ import roomDeluxeImage from '@/assets/room-deluxe.jpg';
 import roomSuiteImage from '@/assets/room-suite.jpg';
 
 const MyBookings = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [bookings, setBookings] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,12 +26,14 @@ const MyBookings = () => {
   };
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (!user) {
       navigate('/auth');
       return;
     }
     fetchBookings();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchBookings = async () => {
     if (!user) return;

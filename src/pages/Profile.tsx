@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const Profile = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -21,24 +21,33 @@ const Profile = () => {
   });
 
   useEffect(() => {
+    if (authLoading) return; // Wait for auth to load
+    
     if (!user) {
       navigate('/auth');
       return;
     }
     fetchProfile();
-  }, [user, navigate]);
+  }, [user, authLoading, navigate]);
 
   const fetchProfile = async () => {
     if (!user) return;
 
     setLoading(true);
+    console.log('Fetching profile for user:', user.id);
+    
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
-    if (!error && data) {
+    console.log('Profile query result:', { data, error });
+
+    if (error) {
+      console.error('Error fetching profile:', error);
+      toast.error('Failed to load profile');
+    } else if (data) {
       setProfile({
         name: data.name || '',
         email: data.email || '',
