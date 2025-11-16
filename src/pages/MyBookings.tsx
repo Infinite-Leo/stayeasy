@@ -37,6 +37,8 @@ const MyBookings = () => {
     if (!user) return;
     
     setLoading(true);
+    console.log('Fetching bookings for user:', user.id);
+    
     const { data, error } = await supabase
       .from('bookings')
       .select(`
@@ -50,7 +52,13 @@ const MyBookings = () => {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
+    console.log('Bookings query result:', { data, error });
+
+    if (error) {
+      console.error('Error fetching bookings:', error);
+      toast.error('Failed to load bookings');
+    } else if (data) {
+      console.log('Setting bookings:', data);
       setBookings(data);
     }
     setLoading(false);
