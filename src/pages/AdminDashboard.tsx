@@ -47,7 +47,15 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
   const [rooms, setRooms] = useState<any[]>([]);
   const [bookings, setBookings] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalRooms: 0,
+    availableRooms: 0,
+    totalBookings: 0,
+    totalRevenue: 0,
+    totalUsers: 0,
+  });
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingRoom, setEditingRoom] = useState<any>(null);
   const [roomForm, setRoomForm] = useState({
@@ -83,9 +91,46 @@ const AdminDashboard = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    await Promise.all([fetchRooms(), fetchBookings()]);
+    await Promise.all([fetchRooms(), fetchBookings(), fetchUsers()]);
+    calculateStats();
     setLoading(false);
   };
+
+  const fetchUsers = async () => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select(`
+        *,
+        user_roles (role)
+      `)
+      .order('created_at', { ascending: false });
+
+    if (!error && data) {
+      setUsers(data);
+    }
+  };
+
+  const calculateStats = () => {
+    const totalRooms = rooms.length;
+    const availableRooms = rooms.filter(r => r.is_available).length;
+    const totalBookings = bookings.length;
+    const totalRevenue = bookings.reduce((sum, b) => sum + Number(b.total_price), 0);
+    const totalUsers = users.length;
+
+    setStats({
+      totalRooms,
+      availableRooms,
+      totalBookings,
+      totalRevenue,
+      totalUsers,
+    });
+  };
+
+  useEffect(() => {
+    if (rooms.length > 0 || bookings.length > 0 || users.length > 0) {
+      calculateStats();
+    }
+  }, [rooms, bookings, users]);
 
   const fetchRooms = async () => {
     const { data, error } = await supabase
@@ -225,10 +270,69 @@ const AdminDashboard = () => {
           </p>
         </div>
 
+        {/* Statistics Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Rooms
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalRooms}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Available Rooms
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{stats.availableRooms}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Bookings
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalBookings}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Revenue
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">₹{stats.totalRevenue.toLocaleString()}</div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-medium text-muted-foreground">
+                Total Users
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{stats.totalUsers}</div>
+            </CardContent>
+          </Card>
+        </div>
+
         <Tabs defaultValue="rooms" className="space-y-6">
           <TabsList>
             <TabsTrigger value="rooms">Rooms</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
+            <TabsTrigger value="users">Users</TabsTrigger>
           </TabsList>
 
           <TabsContent value="rooms">
@@ -448,6 +552,52 @@ const AdminDashboard = () => {
                         <TableCell>
                           <span className="text-xs text-muted-foreground">
                             {format(new Date(booking.created_at), 'MMM dd, yyyy')}
+                          </span>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="users">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Joined</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-medium">{user.name}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.phone || '-'}</TableCell>
+                        <TableCell>
+                          {user.user_roles?.map((ur: any) => (
+                            <Badge 
+                              key={ur.role} 
+                              variant={ur.role === 'admin' ? 'default' : 'secondary'}
+                              className="mr-1"
+                            >
+                              {ur.role}
+                            </Badge>
+                          ))}
+                        </TableCell>
+                        <TableCell>
+                          <span className="text-sm text-muted-foreground">
+                            {format(new Date(user.created_at), 'MMM dd, yyyy')}
                           </span>
                         </TableCell>
                       </TableRow>
