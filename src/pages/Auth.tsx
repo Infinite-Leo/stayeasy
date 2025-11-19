@@ -177,6 +177,16 @@ const Auth = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        
+        <div className="mt-4 text-center">
+          <Button 
+            variant="link" 
+            onClick={() => navigate('/admin-login')}
+            className="text-sm text-muted-foreground hover:text-primary"
+          >
+            Admin? Sign in here
+          </Button>
+        </div>
       </div>
     </div>
   );
